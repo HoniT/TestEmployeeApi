@@ -11,6 +11,11 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = long.MaxValue;
+});
+
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 // builder.Services.AddOpenApi();
@@ -60,6 +65,7 @@ builder.Services.AddAuthentication(options => {
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<INoteRepository, NoteRepository>();
 builder.Services.AddScoped<ITokenService, TokenServices>();
+builder.Services.AddScoped<IFileService, FileService>();
 
 var app = builder.Build();
 

@@ -4,6 +4,8 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using api.Models;
+using api.Helpers;
+using api.Interfaces;
 
 namespace api.Controllers
 {
@@ -13,10 +15,12 @@ namespace api.Controllers
     {
         private readonly string _uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Resources", "Files");
 
-        public FileController()
+        private readonly IFileService _fileService;
+        public FileController(IFileService fileService)
         {
             if (!Directory.Exists(_uploadDir))
                 Directory.CreateDirectory(_uploadDir);
+            _fileService = fileService;
         }
 
         [HttpPost("upload"), DisableRequestSizeLimit]
@@ -77,5 +81,23 @@ namespace api.Controllers
 
             return PhysicalFile(path, "application/octet-stream", fileName);
         }
+
+        [HttpPost("upload-stream")]
+        [Consumes("multipart/form-data")]
+        [ProducesResponseType(typeof(FileUploadSummary), StatusCodes.Status201Created)]
+        [DisableFormValueModelBinding]
+        public async Task<ActionResult<FileUploadSummary>> Upload()
+        {
+            var result = await _fileService.UploadFilesAsync(
+                Request.Body,
+                Request.ContentType!
+            );
+
+            return Created("", result);
+        }
+
+
+
+
     }
 }

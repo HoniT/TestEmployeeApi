@@ -442,3 +442,5 @@ D:\TestEmployeeApi\api\obj\Debug\net10.0\api.pdb
 D:\TestEmployeeApi\api\obj\Debug\net10.0\api.genruntimeconfig.cache
 D:\TestEmployeeApi\api\obj\Debug\net10.0\ref\api.dll
 D:\TestEmployeeApi\api\bin\Debug\net10.0\api.staticwebassets.runtime.json
+C:\Users\admin\NewTestAPI\api\bin\Debug\net10.0\api.staticwebassets.runtime.json
+C:\Users\admin\NewTestAPI\api\obj\Debug\net10.0\api.sourcelink.json
