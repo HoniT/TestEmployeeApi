@@ -65,7 +65,6 @@ builder.Services.AddAuthentication(options => {
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<INoteRepository, NoteRepository>();
 builder.Services.AddScoped<ITokenService, TokenServices>();
-builder.Services.AddScoped<IFileService, FileService>();
 
 var app = builder.Build();
 
