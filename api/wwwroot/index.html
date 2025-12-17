@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>ASP.NET API Frontend</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        input, button { margin: 4px 0; padding: 6px; }
+        button { cursor: pointer; }
+        .box { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; }
+        pre { background: #f4f4f4; padding: 10px; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+
+<h1>ASP.NET Web API Frontend</h1>
+
+<!-- ================= ACCOUNT ================= -->
+<div class="box">
+    <h2>Account</h2>
+
+    <h3>Register</h3>
+    <input id="regUsername" placeholder="Username" />
+    <input id="regEmail" placeholder="Email" />
+    <input id="regPassword" type="password" placeholder="Password" />
+    <button onclick="register()">Register</button>
+
+    <h3>Login</h3>
+    <input id="loginUsername" placeholder="Username" />
+    <input id="loginPassword" type="password" placeholder="Password" />
+    <button onclick="login()">Login</button>
+
+    <h3>Account Output</h3>
+    <pre id="accountOutput"></pre>
+</div>
+
+<!-- ================= EMPLOYEES ================= -->
+<div class="box">
+    <h2>Employees</h2>
+
+    <button onclick="getEmployees()">GET All Employees</button>
+    <br><br>
+
+    <input id="getEmpId" placeholder="Employee ID" />
+    <button onclick="getEmployeeById()">GET Employee By ID</button>
+
+    <h3>Create Employee</h3>
+    <input id="createName" placeholder="Name" />
+    <input id="createLastName" placeholder="Last Name" />
+    <input id="createPosition" placeholder="Position" />
+    <input id="createSalary" type="number" placeholder="Salary" />
+    <button onclick="createEmployee()">Create</button>
+
+    <h3>Update Employee</h3>
+    <input id="updateId" placeholder="Employee ID" />
+    <input id="updateName" placeholder="Name" />
+    <input id="updateLastName" placeholder="Last Name" />
+    <input id="updatePosition" placeholder="Position" />
+    <input id="updateSalary" type="number" placeholder="Salary" />
+    <button onclick="updateEmployee()">Update</button>
+
+    <h3>Delete Employee</h3>
+    <input id="deleteId" placeholder="Employee ID" />
+    <button onclick="deleteEmployee()">Delete</button>
+
+    <h3>Employees Output</h3>
+    <pre id="employeeOutput"></pre>
+</div>
+
+<!-- ================= NOTES ================= -->
+<div class="box">
+    <h2>Notes</h2>
+
+    <h3>GET All Notes</h3>
+    <button onclick="getNotes()">Get Notes</button>
+
+    <h3>GET Note By ID</h3>
+    <input id="noteId" placeholder="Note ID" />
+    <button onclick="getNoteById()">Get Note By ID</button>
+
+    <h3>Create Note</h3>
+    <input id="noteEmployeeId" placeholder="Employee ID" />
+    <input id="noteData" placeholder="Note Text" />
+    <button onclick="createNote()">Create Note</button>
+
+    <h3>Update Note</h3>
+    <input id="updateNoteId" placeholder="Note ID" />
+    <input id="updateNoteData" placeholder="Note Text" />
+    <button onclick="updateNote()">Update Note</button>
+
+    <h3>Delete Note</h3>
+    <input id="deleteNoteId" placeholder="Note ID" />
+    <button onclick="deleteNote()">Delete Note</button>
+
+    <h3>Notes Output</h3>
+    <pre id="noteOutput"></pre>
+</div>
+
+<!-- ================= FILE UPLOAD ================= -->
+<div class="box">
+    <h2>File Upload</h2>
+
+    <h3>Single File Upload</h3>
+    <input type="file" id="fileUpload" />
+    <button onclick="uploadFile()">Upload File</button>
+
+    <h3>Multiple Files Upload</h3>
+    <input type="file" id="multiFileUpload" multiple />
+    <button onclick="uploadMultipleFiles()">Upload Multiple Files</button>
+
+    <h3>File Download</h3>
+    <input id="downloadFileName" placeholder="File name to download" />
+    <button onclick="downloadFile()">Download File</button>
+
+    <h3>File Output</h3>
+    <pre id="fileOutput"></pre>
+</div>
+
+<!-- ================= VIDEO CHUNK UPLOAD ================= -->
+<div class="box">
+    <h2>Video Chunk Upload</h2>
+
+    <input type="file" id="videoFile" />
+    <button onclick="uploadVideo()">Upload Video (Chunked)</button>
+
+    <input id="downloadVideoName" placeholder="Filename to Download" />
+    <button onclick="downloadVideo()">Download Full Video</button>
+
+    <h3>Video Output</h3>
+    <pre id="videoOutput"></pre>
+</div>
+
+<script>
+    let token = null;
+
+    function authHeaders(contentType="application/json") {
+        const h = { "Content-Type": contentType };
+        if (token) h["Authorization"] = "Bearer " + token;
+        return h;
+    }
+
+    function handle(res) {
+        return res.text().then(text => {
+            if (!res.ok) throw text;
+            return text;
+        });
+    }
+
+    // ================= ACCOUNT =================
+    function register() {
+        fetch("/api/account/register", {
+            method: "POST",
+            headers: authHeaders(),
+            body: JSON.stringify({
+                username: regUsername.value,
+                email: regEmail.value,
+                password: regPassword.value
+            })
+        }).then(handle)
+          .then(d => accountOutput.textContent = d)
+          .catch(e => accountOutput.textContent = e);
+    }
+
+    function login() {
+        fetch("/api/account/login", {
+            method: "POST",
+            headers: authHeaders(),
+            body: JSON.stringify({
+                userName: loginUsername.value,
+                password: loginPassword.value
+            })
+        })
+        .then(r => r.json())
+        .then(d => {
+            token = d.token;
+            accountOutput.textContent = "Logged in successfully.\nJWT stored.";
+        })
+        .catch(e => accountOutput.textContent = e);
+    }
+
+    // ================= EMPLOYEES =================
+    function getEmployees() {
+        fetch("/api/employee", { headers: authHeaders() })
+            .then(handle)
+            .then(d => employeeOutput.textContent = d)
+            .catch(e => employeeOutput.textContent = e);
+    }
+
+    function getEmployeeById() {
+        fetch(`/api/employee/${getEmpId.value}`, { headers: authHeaders() })
+            .then(handle)
+            .then(d => employeeOutput.textContent = d)
+            .catch(e => employeeOutput.textContent = e);
+    }
+
+    function createEmployee() {
+        fetch("/api/employee", {
+            method: "POST",
+            headers: authHeaders(),
+            body: JSON.stringify({
+                name: createName.value,
+                lastName: createLastName.value,
+                position: createPosition.value,
+                salary: Number(createSalary.value)
+            })
+        }).then(handle).then(d => employeeOutput.textContent = d).catch(e => employeeOutput.textContent = e);
+    }
+
+    function updateEmployee() {
+        fetch(`/api/employee/${updateId.value}`, {
+            method: "PUT",
+            headers: authHeaders(),
+            body: JSON.stringify({
+                name: updateName.value,
+                lastName: updateLastName.value,
+                position: updatePosition.value,
+                salary: Number(updateSalary.value)
+            })
+        }).then(handle).then(d => employeeOutput.textContent = d).catch(e => employeeOutput.textContent = e);
+    }
+
+    function deleteEmployee() {
+        fetch(`/api/employee/${deleteId.value}`, {
+            method: "DELETE",
+            headers: authHeaders()
+        }).then(handle).then(d => employeeOutput.textContent = d || "Deleted").catch(e => employeeOutput.textContent = e);
+    }
+
+    // ================= NOTES =================
+    function getNotes() {
+        fetch("/api/note", { headers: authHeaders() })
+            .then(handle)
+            .then(d => noteOutput.textContent = d)
+            .catch(e => noteOutput.textContent = e);
+    }
+
+    function getNoteById() {
+        fetch(`/api/note/${noteId.value}`, { headers: authHeaders() })
+            .then(handle)
+            .then(d => noteOutput.textContent = d)
+            .catch(e => noteOutput.textContent = e);
+    }
+
+    function createNote() {
+        fetch(`/api/note/${noteEmployeeId.value}`, {
+            method: "POST",
+            headers: authHeaders(),
+            body: JSON.stringify({ noteData: noteData.value })
+        }).then(handle).then(d => noteOutput.textContent = d).catch(e => noteOutput.textContent = e);
+    }
+
+    function updateNote() {
+        fetch(`/api/note/${updateNoteId.value}`, {
+            method: "PUT",
+            headers: authHeaders(),
+            body: JSON.stringify({ noteData: updateNoteData.value })
+        }).then(handle).then(d => noteOutput.textContent = d).catch(e => noteOutput.textContent = e);
+    }
+
+    function deleteNote() {
+        fetch(`/api/note/${deleteNoteId.value}`, {
+            method: "DELETE",
+            headers: authHeaders()
+        }).then(handle).then(d => noteOutput.textContent = d || "Deleted").catch(e => noteOutput.textContent = e);
+    }
+
+    // ================= FILE UPLOAD =================
+    function uploadFile() {
+        const file = fileUpload.files[0];
+        if (!file) return fileOutput.textContent = "No file selected";
+
+        const form = new FormData();
+        form.append("file", file);
+
+        fetch("/api/file/upload", {
+            method: "POST",
+            headers: token ? { "Authorization": "Bearer " + token } : {},
+            body: form
+        }).then(handle)
+          .then(d => fileOutput.textContent = d)
+          .catch(e => fileOutput.textContent = e);
+    }
+
+    function uploadMultipleFiles() {
+        const files = multiFileUpload.files;
+        if (!files.length) return fileOutput.textContent = "No files selected";
+
+        const form = new FormData();
+        for (const f of files) form.append("files", f);
+
+        fetch("/api/file/multiupload", {
+            method: "POST",
+            headers: token ? { "Authorization": "Bearer " + token } : {},
+            body: form
+        }).then(handle)
+          .then(d => fileOutput.textContent = d)
+          .catch(e => fileOutput.textContent = e);
+    }
+
+    function downloadFile() {
+        const fileName = downloadFileName.value;
+        if (!fileName) return fileOutput.textContent = "Enter a file name";
+
+        fetch(`/api/file/download/${encodeURIComponent(fileName)}`, {
+            headers: token ? { "Authorization": "Bearer " + token } : {}
+        })
+        .then(res => {
+            if (!res.ok) throw "Download failed";
+            return res.blob();
+        })
+        .then(blob => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            fileOutput.textContent = "Download started for " + fileName;
+        })
+        .catch(e => fileOutput.textContent = e);
+    }
+
+    // ================= VIDEO CHUNK UPLOAD =================
+    function uploadVideo() {
+        const file = videoFile.files[0];
+        if (!file) return videoOutput.textContent = "No video selected";
+
+        const form = new FormData();
+        form.append("file", file);
+
+        fetch("/api/VideoUpload/upload", {
+            method: "POST",
+            headers: token ? { "Authorization": "Bearer " + token } : {},
+            body: form
+        }).then(handle)
+          .then(d => videoOutput.textContent = d)
+          .catch(e => videoOutput.textContent = e);
+    }
+
+    function downloadVideo() {
+        const fileName = downloadVideoName.value;
+        if (!fileName) return videoOutput.textContent = "Enter a file name";
+
+        fetch(`/api/VideoUpload/download-full?fileName=${encodeURIComponent(fileName)}`, {
+            headers: token ? { "Authorization": "Bearer " + token } : {}
+        })
+        .then(res => {
+            if (!res.ok) throw "Download failed";
+            return res.blob();
+        })
+        .then(blob => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            videoOutput.textContent = "Download started for " + fileName;
+        })
+        .catch(e => videoOutput.textContent = e);
+    }
+
+</script>
+
+</body>
+</html>

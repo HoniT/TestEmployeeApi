@@ -444,3 +444,4 @@ D:\TestEmployeeApi\api\obj\Debug\net10.0\ref\api.dll
 D:\TestEmployeeApi\api\bin\Debug\net10.0\api.staticwebassets.runtime.json
 C:\Users\admin\NewTestAPI\api\bin\Debug\net10.0\api.staticwebassets.runtime.json
 C:\Users\admin\NewTestAPI\api\obj\Debug\net10.0\api.sourcelink.json
+C:\Users\admin\NewTestAPI\api\obj\Debug\net10.0\compressed\ro3ql4fcli-{0}-eew3vv46b2-eew3vv46b2.gz
