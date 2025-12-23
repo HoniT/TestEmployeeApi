@@ -16,9 +16,11 @@ namespace api.Repository
     public class EmployeeRepository : IEmployeeRepository
     {
         private readonly ApplicationDbContext _context;
-        public EmployeeRepository(ApplicationDbContext context)
+        private readonly INoteRepository _noteRepo;
+        public EmployeeRepository(ApplicationDbContext context, INoteRepository noteRepo)
         {
             _context = context;
+            _noteRepo = noteRepo;
         }
 
         public async Task<List<Employee>> GetAllAsync(EmployeeQuery query)
@@ -98,6 +100,11 @@ namespace api.Repository
             {
                 return null;
             }
+
+            await _context.Notes
+                .Where(n => n.EmployeeId == id)
+                .ExecuteDeleteAsync();
+
 
             _context.Employees.Remove(employeeModel);
             await _context.SaveChangesAsync();
